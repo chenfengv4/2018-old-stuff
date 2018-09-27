@@ -1,0 +1,224 @@
+%-------------------------
+% Resume in Latex
+% Author : chen gao	
+% License : TAMU
+%------------------------
+
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[pdftex]{hyperref}
+\usepackage{fancyhdr}
+
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{0.5in}
+\addtolength{\topmargin}{-0.5 in}
+\addtolength{\textheight}{1.5in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-15pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-4pt}]
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[2]{
+  \item{
+    \textbf{#1}{: #2 \vspace{-5pt}}
+  }
+}
+%format of Subhead. first vspace measures width between straight line and phd in agr. second vspace measures distance between phd an texas a&m
+\newcommand{\resumeSubheading}[2]{
+  \vspace{-6pt}\item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+%      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-1pt}
+}
+
+\newcommand{\resumeSubItem}[2]{\resumeItem{#1}{#2}\vspace{-2pt}}
+
+\renewcommand{\labelitemii}{$\circ$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=*]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-2pt}}
+
+%-------------------------------------------
+%%%%%%  CV STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+%----------HEADING-----------------
+\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+  \textbf{{\LARGE Chen Gao}} & Email: {gaochen2928@gmail.com}\\
+   612 W Ridge Dr, College Station, TX, 77845 & Mobile : +1-979-587-9610 \\
+\end{tabular*}
+%-----------EDUCATION-----------------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {PhD in Agribusiness and Managerial Economics Specialize in Finance }{Expected May. 2019}
+      {Texas A\&M University,}{College Station, TX}{, Top 2 in Qualifier and Prelim, Full Scholarship}
+    \resumeSubheading
+      {M.S. in Economics Specialize in Financial Econometrics}{Aug. 2011 -- May. 2013}
+      {Texas A\&M University,}{College Station, TX}{, GPA 3.75}
+    \resumeSubheading
+     {B.S. in Finance}{Aug. 2007 -- Jun. 2011}
+           {Southwestern University of Finance and Economics,}{Chengdu, China}
+  \resumeSubHeadingListEnd
+
+
+%-----------EXPERIENCE-----------------
+\section{Experience}
+  \resumeSubHeadingListStart
+  \resumeSubheading
+      {Consultant Intern}{Second Pillar Consulting, May. 2018 - present}  
+     
+
+      \vspace{-10pt}
+      \begin{itemize}
+        \item Validated stress testing models for multiple major banks and clients in United States. Responsibilities include data and model assumptions assessment, model replications, back-testing and sensitivity testing and suggestions making for possible model improvements or corrections
+      \vspace{-4pt}
+     
+
+      \item Validated DFAST documentations. Constructed DFAST stress testing reports and validation reports.
+      \vspace{-3pt}
+      \item Built alternative credit score models for farm credit companies using Machine Learning methods. Building loan classification tool to help cutting underwriting cost with ensemble ML algorithm
+      
+      \end{itemize}
+      \vspace{-8pt}
+      
+      
+    \resumeSubheading
+      {Graduate Instructor of Record}{TAMU, Summer 2017, Fall 2017, Spring 2018}  
+      {Economic Analysis for Agribusiness Management, Intermediate Quantitative Methods for Economics}
+
+      \vspace{-10pt}
+      \begin{itemize}
+        \item Teach cross-sectional regressions, time series regressions, fundamental of probability, demand analysis, optimization and other topics. Offer comprehensive skills and techniques to undergraduate students for managerial decision making under complex market conditions and uncertainty
+      \vspace{-4pt}
+     
+
+      \item Direct undergraduate analysis/consultant projects by using SAS and econometric tools with cross-sectional data to address key factors for consumers' behavior/demand on beverage consumption
+      \vspace{-3pt}
+      \item Taught 150 students and directed more than 30 consulting groups so far with teaching evaluation 4.75/5
+      
+      \end{itemize}
+      \vspace{-8pt}
+    \resumeSubheading
+      {Teaching Assistant and Research Assistant}{TAMU, 2013-2017}
+      {Commodity Futures and Options, Rural financial Market and Planning, Macroeconomics of Agriculture, Introduction to AG Economics}
+      \vspace{-10pt}
+      \begin{itemize}
+      \item Grade homework and exams. Prepare class materials and teach lab/review sessions.
+      \vspace{-4pt}
+      \item Collect and clean data. Develop econometric/simulation models and construct reports.
+      \end{itemize}
+      \vspace{-8pt}
+    \resumeSubheading
+    {Project Leader}{TAMU, 2012-2013}
+    \begin{itemize}
+    \vspace{-8pt}
+        \item Collect and clean data for project. Communicate with project director and advisor and report progresses. Assign and summarize team work.
+    \end{itemize}
+\resumeSubHeadingListEnd
+      
+      
+%--------------Skills and Selected Projects--------------
+\section{Selected Projects}
+
+ \resumeSubHeadingListStart
+%  \resumeSubheading
+%   {futures price discovery and volatility transmission}{}
+%    \vspace{-18pt}
+%    \begin{itemize}
+%    \item Investigated the price discovery function of index futures for China's stock market by using VECM and the transmission of market volatility between futures market and spot market with Asymmetric-ECM GARCH model
+%    \item\small{Captured structure break periods during which newly introduced futures might be potentially function-less and more volatility would be spilled over to spot market}
+%    \end{itemize}
+  
+  \resumeSubheading
+   {Futures Price Discovery and Volatility Transmission}{TAMU,2016-2017}
+    \vspace{-20pt}
+    \begin{itemize}
+    \item Investigated the price discovery function of commodity futures and their co-integration relation by using VECM and the transmission of market volatility between futures market and spot market with Asymmetric-ECM GARCH model
+    \vspace{-4pt}
+    \item Captured structure break periods during which newly introduced futures might be potentially irrational/function-less and more volatility would be spilled over to spot market. Developed optimal hedge ratio and trading strategy to minimize downside risk.
+    \vspace{-8pt}
+    \end{itemize} 
+
+  \resumeSubheading
+  {Agricultural Enterprises Default Risk Analysis }{TAMU,2017-2018}
+   \vspace{-20pt}
+   \begin{itemize}
+       \item Predicted and simulated agricultural commodity prices and crop yields based on empirical distribution with Monte Carlo Simulation
+       \vspace{-4pt}
+       \item Adopted default probability analysis, composite credit score analysis and stress testing with scenarios of different monetary policy and tax policy to predict firms' performance and survivability
+       \vspace{-4pt}
+   \end{itemize}
+   \resumeSubheading
+   {Evaluating Hedge Fund Performance and Risk}{TAMU,2015-2016}
+   \vspace{-18pt}
+   \begin{itemize}
+       \item Evaluated 3400 mutual funds' performance over 10 years by using bootstrap simulations and proved superior fund performance exists and persists
+       \vspace{-4pt}
+       \item Proved fund portfolio alpha is correlated with lagged R square with rolling window estimation
+       \vspace{-4pt}
+       \item Modeled, Estimated and forecasted fund excess returns and alphas and investigated the correlation between fund performance with risk by using Fama-MacBeth method
+   \end{itemize}
+  \resumeSubHeadingListEnd
+
+%------------Presentation and Publication---
+%\section{Presentation and Publication}
+
+%\resumeItemListStart
+%\vspace{-4pt}
+%\resumeItem{Presenter and Section Chair}{`` Monetary Policy, Farm Sector Income and Farm Household Well-being----a VECM Analysis", Chen Gao and David Leatham
+%, 2017 SAEA annual meeting}
+%\vspace{-4pt}
+%\resumeItem{Presenter}{``Application of Demand Analysis Framework to Understand the Price and Volume Movement of Exchange Traded Funds (ETFs)", Chengcheng Fei, Chen Gao and Erin Hardin,
+% 2016 SAEA annual meeting}
+%\vspace{-4pt}
+%\resumeItem{``Technical Efficiency and Port Competition: Revisiting the Bohai Economic Rim"}{Grace Wang and Chen Gao, Journal of Risk and Financial Management, Volume 5, 2013}
+%\resumeItemListEnd
+%\vspace{-4pt}
+
+%----------------Selected Courses and Skills----
+
+\section{Selected Courses and Skills}
+  \resumeSubHeadingListStart
+  \vspace{-4pt}
+    \resumeItem{Selected PhD Courses}{Empirical Asset Pricing, Theoretical Asset Pricing, Empirical Corporate Finance, Applied Econometrics, Financial Time Series Analysis, Microeconomics, Macroeconomics, Demand and Welfare Analysis }
+    \vspace{-4pt}  
+    
+    \resumeItem{Skills and Certificates}{Statistical Machine Learning, Financial Data Analysis and Time Series Forecasting, Asset Pricing, Stress Testing, Default Risk and Downside Risk Management, Credit Score Analysis, Demand Analysis. Proficiency in R, SAS, STATA, SQL, GUIDE, Python, Simetar. SAS Base/Advanced/Business programming certified, CFA level I, Native Mandarin, Fluent English }
+    \vspace{-5pt}
+    \resumeItem{Work Authorization}{Eligible to wrok in the U.S. with CPT and OPT.}
+  \resumeSubHeadingListEnd
+
+
+%-------------------------------------------
+\end{document}
