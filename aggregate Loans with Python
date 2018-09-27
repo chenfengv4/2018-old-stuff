@@ -9,7 +9,7 @@ import pandas as pd
 import os
 import itertools
 import datetime
-os.chdir( r'C:\secondPillar\AgCountrySTA') 
+os.chdir( r'C:\second*****\********STA') 
 ind_code= pd.read_csv('industry code.csv')
 
 years=list(range(2011, 2018))
@@ -17,7 +17,7 @@ months=['03', '06', '09', '12']
 comb= list(itertools.product(years, months))
 comb= pd.DataFrame(comb)
 comb.columns=['year', 'month']
-homepath= r'C:\secondPillar\AgCountrySTA\Historical Data - AgCountry'
+homepath= r'C:\second*****\*********STA\Historical Data - *********'
 comb['filename']=comb.apply(lambda x: homepath+'\\' +str(x[0])+'\\072_'+str(x[0])+x[1]+'_LAData.xls', axis=1)
 
 filename=list(comb.filename)
@@ -48,9 +48,9 @@ output1= output1.loc[:, ['ExtractDate', 'CustomerNumber', 'LoanNumber',
        'Principal', 'Volume', 'DataSourceIndex']]
 output1= output1.sort_values(by=['CustomerNumber','ExtractDate',  'LoanNumber'])
 output1= output1[pd.isnull(output1.ExtractDate) ==False]
-os.chdir( r'C:\secondPillar\AgCountrySTA')        
-output1.to_excel('AgCountry.xlsx', index=False)        
-output1.to_csv('AgCountry.csv', index=False)        
+os.chdir( r'C:\second*****\*********STA')        
+output1.to_excel('*********.xlsx', index=False)        
+output1.to_csv('*********.csv', index=False)        
         
 # y is the list of Industy code missed
 x=list(output.Industry.unique()     )
@@ -61,7 +61,7 @@ y
 '''
 Read United data
 '''
-os.chdir(r'C:\secondPillar\AgCountrySTA\Historical Data - United\data')
+os.chdir(r'C:\secondPillar\*********STA\Historical Data - United\data')
 years=list(range(2012, 2017))
 months=['03', '06', '09', '12']
 comb= list(itertools.product(years, months))
@@ -102,7 +102,7 @@ output_united1.ExtractDate= output_united1.ExtractDate.apply(lambda x: datetime.
 
 output_united1= output_united1.sort_values(by=['CustomerNumber','ExtractDate',  'LoanNumber'])
 
-os.chdir( r'C:\secondPillar\AgCountrySTA')        
+os.chdir( r'C:\second*********\*********STA')        
 output_united1.to_excel('United.xlsx', index=False)        
 output_united1.to_csv('United.csv', index=False)        
         
@@ -110,7 +110,7 @@ output_united1.to_csv('United.csv', index=False)
 '''
 Read Post Merged
 '''
-os.chdir(r'C:\secondPillar\AgCountrySTA\Post Merger Data - New AgCountry')
+os.chdir(r'C:\second*********\*********STA\Post Merger Data - New *********')
 files=['201709','201712', '201803']
 filename= ['072_'+x+'_LAData.xls' for x in files ]
 
@@ -138,7 +138,7 @@ output_merge1= output_merge1.loc[:, ['ExtractDate', 'CustomerNumber', 'LoanNumbe
        'Principal', 'Volume', 'DataSourceIndex']]
 output_merge1= output_merge1.sort_values(by=['CustomerNumber','ExtractDate',  'LoanNumber'])
 output_merge1= output_merge1[pd.isnull(output_merge1.ExtractDate) ==False]
-os.chdir( r'C:\secondPillar\AgCountrySTA')        
+os.chdir( r'C:\second*********\*********STA')        
 output_merge1.to_excel('PostMerge.xlsx', index=False)        
 output_merge1.to_csv('PostMerge.csv', index=False)        
 
