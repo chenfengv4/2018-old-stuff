@@ -1,0 +1,220 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jul 31 15:48:20 2018
+
+@author: chen gao
+"""
+
+import pandas as pd
+import os
+import itertools
+import datetime
+os.chdir( r'C:\secondPillar\AgCountrySTA') 
+ind_code= pd.read_csv('industry code.csv')
+
+years=list(range(2011, 2018))
+months=['03', '06', '09', '12']
+comb= list(itertools.product(years, months))
+comb= pd.DataFrame(comb)
+comb.columns=['year', 'month']
+homepath= r'C:\secondPillar\AgCountrySTA\Historical Data - AgCountry'
+comb['filename']=comb.apply(lambda x: homepath+'\\' +str(x[0])+'\\072_'+str(x[0])+x[1]+'_LAData.xls', axis=1)
+
+filename=list(comb.filename)
+filename=filename[:-2]
+filename=filename[1:]
+
+colsample=['ExtractDate', 'CustomerNumber', 'LoanNumber', 'Industry', 
+       'PD Rating',  'CrScore',  'Commitment', 'Principal', 'Volume']
+
+'''
+for file in filename:
+    x=pd.read_excel(file)
+    col= x.columns
+    if (set(colsample)<set(col))==False:
+        print(file)
+'''
+output=pd.DataFrame()
+for file in filename:
+    x=pd.read_excel(file)
+    dta=x.loc[:, colsample]
+    dta['DataSourceIndex']=1
+    output=pd.concat([output, dta])
+
+output1=pd.merge(output, ind_code, how='outer')
+output1= output1.loc[:, ['ExtractDate', 'CustomerNumber', 'LoanNumber', 
+                         'Industry','Industry Code' ,
+       'PD Rating',  'CrScore',  'Commitment',
+       'Principal', 'Volume', 'DataSourceIndex']]
+output1= output1.sort_values(by=['CustomerNumber','ExtractDate',  'LoanNumber'])
+output1= output1[pd.isnull(output1.ExtractDate) ==False]
+os.chdir( r'C:\secondPillar\AgCountrySTA')        
+output1.to_excel('AgCountry.xlsx', index=False)        
+output1.to_csv('AgCountry.csv', index=False)        
+        
+# y is the list of Industy code missed
+x=list(output.Industry.unique()     )
+y= [i for i in x if(i in list(ind_code['Industry']))==False ]        
+y
+
+
+'''
+Read United data
+'''
+os.chdir(r'C:\secondPillar\AgCountrySTA\Historical Data - United\data')
+years=list(range(2012, 2017))
+months=['03', '06', '09', '12']
+comb= list(itertools.product(years, months))
+comb= pd.DataFrame(comb)
+comb.columns=['year', 'month']
+comb['filename']=comb.apply(lambda x: str(x[0])+x[1]+'.xls', axis=1)
+filename=list(comb.filename)
+filename=filename[:-3]+ filename[-2:]
+
+colsample_united=['Period', 'CIF_NBR', 'LOAN_NBR', 'CUST_AG_BUSINESS', 
+       'PD Rating',  'CrScore',  'COMMITMENT_AMT', 
+       'Principal (column AA) – Principal Adjusted for Sold Portions',
+       'Volume (column AB) – Volume Adjusted for Sold Portions']
+
+'''
+for file in filename:
+    x=pd.read_excel(file)
+    col= x.columns
+    if (set(colsample_united)<set(col))==False:
+        print(file)
+'''
+output_united=pd.DataFrame()
+for file in filename:
+    x=pd.read_excel(file)
+    dta=x.loc[:, colsample_united]
+    dta.columns=colsample
+    dta['DataSourceIndex']=0
+    output_united=pd.concat([output_united, dta])
+
+output_united1=pd.merge(output_united, ind_code, how='outer')
+output_united1= output_united1.loc[:, ['ExtractDate', 'CustomerNumber', 'LoanNumber', 
+                         'Industry','Industry Code' ,
+       'PD Rating',   'CrScore',  'Commitment',
+       'Principal', 'Volume', 'DataSourceIndex']]
+
+output_united1= output_united1[pd.isnull(output_united1.ExtractDate) ==False]
+output_united1.ExtractDate= output_united1.ExtractDate.apply(lambda x: datetime.datetime.strptime(x, "%m/%d/%Y"))
+
+output_united1= output_united1.sort_values(by=['CustomerNumber','ExtractDate',  'LoanNumber'])
+
+os.chdir( r'C:\secondPillar\AgCountrySTA')        
+output_united1.to_excel('United.xlsx', index=False)        
+output_united1.to_csv('United.csv', index=False)        
+        
+
+'''
+Read Post Merged
+'''
+os.chdir(r'C:\secondPillar\AgCountrySTA\Post Merger Data - New AgCountry')
+files=['201709','201712', '201803']
+filename= ['072_'+x+'_LAData.xls' for x in files ]
+
+colsample=['ExtractDate', 'CustomerNumber', 'LoanNumber', 'Industry', 
+       'PD Rating',  'CrScore',  'Commitment', 'Principal', 'Volume']
+
+'''
+for file in filename:
+    x=pd.read_excel(file)
+    col= x.columns
+    if (set(colsample)<set(col))==False:
+        print(file)
+'''
+output_merge=pd.DataFrame()
+for file in filename:
+    x=pd.read_excel(file)
+    dta=x.loc[:, colsample]
+    dta['DataSourceIndex']=2
+    output_merge=pd.concat([output_merge, dta])
+
+output_merge1=pd.merge(output_merge, ind_code, how='outer')
+output_merge1= output_merge1.loc[:, ['ExtractDate', 'CustomerNumber', 'LoanNumber', 
+                         'Industry','Industry Code' ,
+       'PD Rating',  'CrScore',  'Commitment',
+       'Principal', 'Volume', 'DataSourceIndex']]
+output_merge1= output_merge1.sort_values(by=['CustomerNumber','ExtractDate',  'LoanNumber'])
+output_merge1= output_merge1[pd.isnull(output_merge1.ExtractDate) ==False]
+os.chdir( r'C:\secondPillar\AgCountrySTA')        
+output_merge1.to_excel('PostMerge.xlsx', index=False)        
+output_merge1.to_csv('PostMerge.csv', index=False)        
+
+'''
+Aggregate all data
+'''
+alldata= pd.concat([output1, output_united1, output_merge1])
+alldata= alldata.reset_index(drop=True)
+alldata.ExtractDate=alldata.ExtractDate.apply(lambda x: x.date())
+
+alldata.to_csv('alldata.csv',index=False)
+
+groupdata= alldata.groupby(['ExtractDate', 'CustomerNumber','Industry',
+                             'DataSourceIndex'])
+
+compare1= groupdata['PD Rating',  'CrScore'].max()
+compare2= groupdata['PD Rating',  'CrScore'].mean()
+
+(compare1['PD Rating']==compare2['PD Rating']).mean()
+(compare1['CrScore']==compare2['CrScore']).mean()
+
+compare1.columns=['PD Rating max', 'CrScore max']
+compare2.columns=['PD Rating mean', 'CrScore mean']
+compare1=compare1.reset_index()
+compare2=compare2.reset_index()
+
+compare= pd.merge(compare1, compare2, how='outer')
+compare['test']= (compare['PD Rating max']==compare['PD Rating mean'])
+compare.to_csv('finddiff.csv', index=False)
+
+compare= compare.loc[:, ['ExtractDate', 'CustomerNumber', 'Industry',
+                         'DataSourceIndex', 'test']]
+
+alldata1= pd.merge(alldata, compare)
+alldata1.test.mean()
+compare.test.mean()
+
+alldata_remove= alldata1[alldata1.test==True]
+groupdata2= alldata_remove.groupby(['ExtractDate', 'CustomerNumber','Industry',
+                             'DataSourceIndex'])
+agg1= groupdata2[ 'Commitment', 'Principal','Volume'].sum()
+agg2= pd.DataFrame(groupdata2['PD Rating'].max())
+
+agg1= agg1.reset_index()
+agg2= agg2.reset_index()
+agg=pd.merge(agg1, agg2)
+agg= pd.merge(agg, ind_code, how='outer')
+
+agg=agg.loc[:,['ExtractDate', 'CustomerNumber', 'Industry', 'Industry Code',
+               'DataSourceIndex','PD Rating',
+       'Commitment', 'Principal', 'Volume'  ]]
+
+agg.to_csv('AggregatedData.csv', index=False)
+agg.to_excel('AggregatedData.xlsx', index=False)
+
+
+
+
+'add one column to see how many obs have issues'
+'''
+'''
+agg3=agg
+agg3['IndustryIssueIndex']=1
+groupdata3= agg3.groupby(['ExtractDate', 'CustomerNumber',
+                             'DataSourceIndex'])
+agg3= groupdata3[ 'IndustryIssueIndex'].sum()
+agg3=agg3.reset_index()
+agg3.IndustryIssueIndex.unique()
+(agg3.IndustryIssueIndex==3).mean()
+agg3.to_csv('agg3.csv', index = False)
+agg4=agg
+agg['SourceIssueIndex']=1
+groupdata4= agg4.groupby(['ExtractDate', 'CustomerNumber',
+                             'Industry'])
+agg4= groupdata4[ 'SourceIssueIndex'].sum()
+agg4=agg4.reset_index()
+agg4.SourceIssueIndex.unique()
+(agg4.SourceIssueIndex==2).mean()
+agg4.to_csv('agg4.csv', index=False)
