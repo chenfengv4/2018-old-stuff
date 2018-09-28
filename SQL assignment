@@ -1,0 +1,59 @@
+/* Yelp data profiling and analyzing*/
+/*find columns with null in the User table*/
+/* count total number of rows for each column and if any one ls less than the number of rows of ID, that column contains NULL*/	
+SELECT COUNT(ID) , COUNT(NAME), COUNT(REVIEW_COUNT), COUNT(YELPING_SINCE), COUNT(USEFUL), COUNT(FUNNY), COUNT(COOL), COUNT(FANS), COUNT(AVERAGE_STARS), COUNT(COMPLIMENT_HOT), COUNT(COMPLIMENT_MORE), COUNT(COMPLIMENT_PROFILE), COUNT(COMPLIMENT_CUTE),COUNT(COMPLIMENT_LIST), COUNT(COMPLIMENT_NOTE),COUNT(COMPLIMENT_PLAIN),COUNT(COMPLIMENT_COOL),COUNT(COMPLIMENT_FUNNY),COUNT(COMPLIMENT_WRITER),COUNT(COMPLIMENT_PHOTOS)
+FROM USER
+/*List the cities with the most reviews in descending order*/
+select id 
+,sum(review_count) as SumRiew
+,city 
+from business 
+group by city 
+order by SumRiew desc
+/*then find the distribution of star ratings to the business in the city of Avon and Beachwood*/
+select stars
+, sum(review_count) as count 
+from business 
+where city = 'Avon' 
+group by stars
+select stars
+, sum(review_count) as count 
+from business 
+where city = 'Beachwood' 
+group by stars
+/*retrive the top users based on their total number of reviews*/
+select 
+name
+, review_count 
+from user 
+order by review_count desc 
+limit 3	
+/*here only 3 top users are retrived and are enough to get a sense of how many reviews they have*/
+/*a deeper dig for shopping business with different rating*/
+/*hours comparation, 2-3 stars*/
+select hours from hours where business_id in (select business_id from category where business_id in(
+select id from business where city ='Las Vegas' and stars >=2 and stars <=3) and category ='Shopping')
+/* 4-5 stars*/
+select hours from hours where business_id in (select business_id from category where business_id in(
+select id from business where city ='Las Vegas' and stars >=4 and stars <=5) and category ='Shopping')
+/*num of reviews comparation, 2-3 stars*/
+select review_count from business where id in (select business_id from category where business_id in(
+select id from business where city ='Las Vegas' and stars >=2 and stars <=3) and category ='Shopping')		
+/* 4-5 stars*/
+select review_count from business where id in (select business_id from category where business_id in(
+select id from business where city ='Las Vegas' and stars >=4 and stars <=5) and category ='Shopping')
+/* 2-3 stars*/
+select city,sum(review_count), state from business where id in (select business_id from category where business_id in(
+select id from business where  stars >=2 and stars <=3) and category ='Shopping') group by city
+/* 4-5 stars*/
+select city,sum(review_count), state from business where id in (select business_id from category where business_id in(
+select id from business where  stars >=4 and stars <=5) and category ='Shopping') group by city
+
+/*find the differences of businesses that are still open vs. those are closed*/
+select is_open,avg(stars) from business group by is_open
+
+select is_open , sum(review_count) from business group by is_open
+/*draw some data for regression analysis to predict num of fans for a user*/
+select id, fans, review_count,strftime('%Y','now')-strftime('%Y',yelping_since) as years, useful, funny, cool,average_stars from user where fans >0 order by fans desc
+
+
