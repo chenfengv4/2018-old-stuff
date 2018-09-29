@@ -1,0 +1,38 @@
+setwd('C:/second*****/Farm Credit****/R')
+creditdata<-read.csv(' Dataset 14 87VarWithApproval.csv',
+                     header=T, na.strings = c('',' ','NA'))
+
+str(creditdata)
+creditdata$Utilization<-as.numeric(as.character( creditdata$Utilization))
+str(creditdata)
+
+
+i<-which(colnames(creditdata)=='Risk.Rating...PD...Assigned')
+a<-creditdata[,-i]
+write.table(a, file = 'data14withApproval.txt', sep = ' ', row.names = FALSE, na='NA')
+b<-as.data.frame(colnames(a))
+c<-as.vector(1:ncol(a))
+
+
+d<-c()
+for (i in (1:ncol(a))){
+  if (colnames(a[i])=='Approval'){
+    d<-append(d, 'd')
+  }
+  else{
+    if (class(a[,i])=='factor'){
+      d<-append(d, 'c')
+    }
+    else {
+      d<-append(d, 'n')
+    }
+  }
+}
+####did not involve cost matrix yet
+###next need to introduce cost matrix into the model
+cat('data14withApproval.txt\n', file = 'data14withApprovaldes.txt')
+cat('NA\n', file = 'data14withApprovaldes.txt', append = T)
+cat('2\n', file = 'data14withApprovaldes.txt', append = T)
+write.table(m2, file='data14withApprovaldes.txt', sep = ' ', quote = FALSE, col.names = FALSE, append=T)
+
+##move to GUIDE or CHAID###
