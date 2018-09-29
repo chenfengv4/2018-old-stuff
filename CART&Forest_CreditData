@@ -1,0 +1,375 @@
+setwd('C:/second****/Farm Credit****/R')
+creditdata<-read.csv('Q1Modified.csv',
+                     header=T)
+
+library(rpart)
+library(rpart.plot)
+library(randomForest)
+
+#This dataset has already removed interest rate as that shall be caused by PD not be a predictor of PD
+#This dataset has also removed 'original loan data' as date for new loan will not appear in dataset making it useless
+#to predict PD for new loans
+#the random forest methods requires all independent variables containing no NA. Further, for factor
+#variables shall not contain more than 53 factors
+
+
+
+#try to predict PD Assigned directly without modifying data, using regression CART
+creditdata$Risk.Rating...PD...Assigned<-as.numeric(creditdata$Risk.Rating...PD...Assigned)
+g<-runif(nrow(creditdata))
+datar<-creditdata[order(g),]
+
+
+trainData<-datar[1:200000,]
+testData<-datar[200001:250039,]
+tree1<-rpart(trainData$Risk.Rating...PD...Assigned~., data=trainData, method = 'anova')
+tree1
+rpart.plot(tree1, type = 3, digits = 3, fallen.leaves = TRUE)
+
+p1<-predict(tree1, testData)
+MAE <- function(actual , predicted){
+  mean(abs(as.numeric(actual)-as.numeric(predicted)))
+}
+MAPE <- function(actual , predicted){
+  mean(abs((actual- predicted)/actual))
+}
+MAE
+MAPE
+mae<-MAE(testData$Risk.Rating...PD...Assigned, p1)
+mape<-MAPE(testData$Risk.Rating...PD...Assigned, p1)
+mae
+mape
+
+#maybe drop the city variable
+city<-which(colnames(creditdata)=='City')
+creditdata<-creditdata[,-city]
+
+creditdata$Risk.Rating...PD...Assigned<-as.numeric(creditdata$Risk.Rating...PD...Assigned)
+g<-runif(nrow(creditdata))
+datar<-creditdata[order(g),]
+
+
+trainData<-datar[1:200000,]
+testData<-datar[200001:250039,]
+tree2<-rpart(trainData$Risk.Rating...PD...Assigned~., data=trainData, method = 'anova', x= TRUE , y= TRUE)
+tree2
+rpart.plot(tree2, type = 2, digits = 3, fallen.leaves = TRUE)
+
+p1<-predict(tree2, testData)
+MAE <- function(actual , predicted){
+  mean(abs(as.numeric(actual)-as.numeric(predicted)))
+}
+MAPE <- function(actual , predicted){
+  mean(abs((actual- predicted)/actual))
+}
+MAE
+MAPE
+mae<-MAE(testData$Risk.Rating...PD...Assigned, p1)
+mape<-MAPE(testData$Risk.Rating...PD...Assigned, p1)
+mae
+mape
+
+
+#use random forest
+#NA not permited for random tree in randomForest package. delete variables with NA
+candidatesnodata.index <- c()
+for (j in (1 : ncol(creditdata)))   {
+  
+  if (    sum(is.na(creditdata[,j]))>0    )
+  {candidatesnodata.index <- append(candidatesnodata.index,j)}
+}
+
+creditdata <- creditdata[ , - candidatesnodata.index]
+#randomForest cannot handle categorical predictors with more that 53 catefories. delete those variables
+candidatesnodata.index <- c()
+for (j in (1 : ncol(creditdata)))   {
+  
+  if (    nlevels(creditdata[,j])>53   )
+  {candidatesnodata.index <- append(candidatesnodata.index,j)}
+}
+
+creditdata <- creditdata[ , - candidatesnodata.index]
+creditdata$Risk.Rating...PD...Assigned<-as.numeric(creditdata$Risk.Rating...PD...Assigned)
+g<-runif(nrow(creditdata))
+datar<-creditdata[order(g),]
+
+
+trainData<-datar[1:200000,]
+testData<-datar[200001:250039,]
+y<-which(colnames(trainData)=='Risk.Rating...PD...Assigned')
+xTrain<-trainData[,-y]
+yTrain<-trainData[,y]
+TREE<-rpart(trainData$Risk.Rating...PD...Assigned~., data = trainData, method = 'anova')
+TREE
+rpart.plot(TREE, type = 3, digits = 3, fallen.leaves = TRUE)
+
+p1<-predict(TREE, testData)
+MAE <- function(actual , predicted){
+  mean(abs(as.numeric(actual)-as.numeric(predicted)))
+}
+MAPE <- function(actual , predicted){
+  mean(abs((actual- predicted)/actual))
+}
+MAE
+MAPE
+mae<-MAE(testData$Risk.Rating...PD...Assigned, p1)
+mape<-MAPE(testData$Risk.Rating...PD...Assigned, p1)
+mae
+mape
+#CART predict worse, run random forest
+#if na.pass do we need to remode NA?
+forest1<-randomForest(x=xTrain, y=yTrain,xtest = testData[,-y], ytest = testData[,y], ntree = 10, replace = TRUE, importance = TRUE,
+                      keep.forest = TRUE, na.action=na.omit)
+
+p2<-predict(forest1, testData)
+MAE <- function(actual , predicted){
+  mean(abs(as.integer(actual) -as.integer( predicted)))
+}
+MAPE <- function(actual , predicted){
+  mean(abs((actual- predicted)/actual))
+}
+MAE
+MAPE
+mae<-MAE(testData$Risk.Rating...PD...Assigned, p2)
+mape<-MAPE(testData$Risk.Rating...PD...Assigned, p2)
+mae
+mape
+
+library(xlsx)
+imp<-importance(forest1, type = 1)
+write.xlsx(forest1$importance, 'PDscoreImportanceMatrix.xlsx', sheetName = 'imp')
+
+######################################
+#stop here#################
+#MAE from random forest is around 0.23. 
+#shall remove interest rate to see how well the other variables can predict##
+###############################
+a<-which(colnames(creditdata)=='InterestRate')
+
+creditdata2 <- creditdata[ , - a]
+creditdata2$Risk.Rating...PD...Assigned<-as.numeric(creditdata2$Risk.Rating...PD...Assigned)
+g<-runif(nrow(creditdata2))
+datar<-creditdata2[order(g),]
+
+
+trainData<-datar[1:200000,]
+testData<-datar[200001:250039,]
+y<-which(colnames(trainData)=='Risk.Rating...PD...Assigned')
+xTrain<-trainData[,-y]
+yTrain<-trainData[,y]
+
+forest2<-randomForest(x=xTrain, y=yTrain,xtest = testData[,-y], ytest = testData[,y], ntree = 10, replace = TRUE, importance = TRUE,
+                      keep.forest = TRUE, na.action=na.omit)
+
+p2<-predict(forest2, testData)
+MAE <- function(actual , predicted){
+  mean(abs(as.integer(actual) -as.integer( predicted)))
+}
+MAPE <- function(actual , predicted){
+  mean(abs((actual- predicted)/actual))
+}
+MAE
+MAPE
+mae<-MAE(testData$Risk.Rating...PD...Assigned, p2)
+mape<-MAPE(testData$Risk.Rating...PD...Assigned, p2)
+mae
+mape
+write.xlsx(forest2$importance, 'PDscoreImportanceMatrix(noInterestRate.xlsx', sheetName = 'imp')
+
+
+#####
+
+
+# foresttree1<-getTree(forest1,k=1)
+# foresttree1
+#####################
+#do not use, failed####
+###############
+#the following part is to intall the package of reprtree
+options(repos='http://cran.rstudio.org')
+have.packages <- installed.packages()
+cran.packages <- c('devtools','plotrix','randomForest','tree')
+to.install <- setdiff(cran.packages, have.packages[,1])
+if(length(to.install)>0) install.packages(to.install)
+
+library(devtools)
+if(!('reprtree' %in% installed.packages())){
+  install_github('araastat/reprtree')
+}
+for(p in c(cran.packages, 'reprtree')) eval(substitute(library(pkg), list(pkg=p)))
+
+
+
+library(reprtree)
+foresttree1<-getTree(forest1,k=1, labelVar = TRUE)
+foresttree1
+realtree <- reprtree:::as.tree(foresttree1, forest1)
+reprtree:::plot.getTree(forest1, k=1, labelVar=TRUE)
+
+######################
+######################
+#use another package for random forest
+library(party)
+memory.limit(size = 160000)
+forest2<-cforest(trainData$Risk.Rating...PD...Assigned~., data=trainData, controls =  cforest_control(mincriterion = qnorm(0.95), ntree = 50))
+pt <- prettytree(forest2@ensemble[[1]], names(forest2@data@get("input"))) 
+#  nt <- new("BinaryTree") 
+#  nt@tree <- pt 
+#  nt@data <- forest2@data 
+#  nt@responses <- forest2@responses 
+# # 
+#  plot(nt, type='simple')
+plot(new("BinaryTree", tree=pt, data=forest2@data, responses=forest2@responses))
+#return error code that no string supplied for strwidth unit
+#try alternative
+
+get_cTree <- function(forest2, k) {
+  dt <- forest2@data@get("input")
+  tr <- party:::prettytree(forest2@ensemble[[k]], names(dt))
+  tr_updated <- update_tree(tr, dt)
+  new("BinaryTree", tree=tr_updated, data=forest2@data, responses=forest2@responses, 
+      cond_distr_response=forest2@cond_distr_response, predict_response=forest2@predict_response)
+}
+
+update_tree <- function(x, dt) {
+  x <- update_weights(x, dt)
+  if(!x$terminal) {
+    x$left <- update_tree(x$left, dt)
+    x$right <- update_tree(x$right, dt)   
+  } 
+  x
+}
+update_weights <- function(x, dt) {
+  splt <- x$psplit
+  spltClass <- attr(splt,"class")
+  spltVarName <- splt$variableName
+  spltVar <- dt[,spltVarName]
+  spltVarLev <- levels(spltVar)
+  if (!is.null(spltClass)) {
+    if (spltClass=="nominalSplit") {
+      attr(x$psplit$splitpoint,"levels") <- spltVarLev   
+      filt <- spltVar %in% spltVarLev[as.logical(x$psplit$splitpoint)] 
+    } else {
+      filt <- (spltVar <= splt$splitpoint)
+    }
+    x$left$weights <- as.numeric(filt)
+    x$right$weights <- as.numeric(!filt)
+  }
+  x
+}
+
+plot(get_cTree(forest2, 30))
+
+p3<-predict(forest2,newdata= testData, type='response')
+MAE <- function(actual , predicted){
+  mean(abs(as.integer(actual) -as.integer( predicted)))
+}
+MAPE <- function(actual , predicted){
+  mean(abs((actual- predicted)/actual))
+}
+MAE
+MAPE
+mae<-MAE(testData$Risk.Rating...PD...Assigned, p3)
+mape<-MAPE(testData$Risk.Rating...PD...Assigned, p3)
+mae
+mape
+
+
+
+
+
+
+
+
+
+
+
+
+candidatesnodata.index <- c()
+# for (j in (1 : ncol(creditdata)))   {
+# 
+#   if (    is.numeric(creditdata[ ,j])  &  length(unique(as.numeric(creditdata[ ,j]))) == 1      )
+#   {candidatesnodata.index <- append(candidatesnodata.index,j)}
+# }
+# 
+# creditdata <- creditdata[ , - candidatesnodata.index]
+
+for (j in (1 : ncol(creditdata)))   {
+  
+  if (    sum(is.na(creditdata[,j]))>0    )
+  {candidatesnodata.index <- append(candidatesnodata.index,j)}
+}
+
+creditdata <- creditdata[ , - candidatesnodata.index]
+
+
+# #drop predictors with more than 53 categories
+candidatesnodata.index <- c()
+for (j in (1 : ncol(creditdata)))   {
+  
+  if (    nlevels(creditdata[,j])>53   )
+  {candidatesnodata.index <- append(candidatesnodata.index,j)}
+}
+
+creditdata <- creditdata[ , - candidatesnodata.index]
+g<-runif(nrow(creditdata))
+datar<-creditdata[order(g),]
+datar
+datar$Delinquency<-as.factor(datar$Delinquency)
+datar$Default.Indicator<-as.factor(datar$Default.Indicator)
+trainData<-datar[1:150000,]
+testData<-datar[150001:191949,]
+trainX<-datar[1:150000,-12]
+trainY<-datar[1:150000,12]
+
+
+#tree1<-rpart(trainData$Default.Indicator~., data= trainData,method = 'class', x=TRUE, y=TRUE)
+treeCreditScore<-rpart(trainData$Risk.Rating...PD...Assigned~.,data=trainData, method = 'anova', x=TRUE, y=TRUE)
+treeCreditScore
+#tree1
+#rpart.plot(tree1, type = 3, digits = 3, fallen.leaves = TRUE, cex = NULL, tweak = 2.2)
+rpart.plot(treeCreditScore, type =3, digits = 3, fallen.leaves = TRUE)
+# prp(tree1)
+# prp(tree1, varlen = 3)
+# new.tree1<-prp(tree1, snip = TRUE)$obj
+
+p1<-predict(treeCreditScore, testData)
+MAE <- function(actual , predicted){
+  mean(abs(actual- predicted))
+}
+MAPE <- function(actual , predicted){
+  mean(abs((actual- predicted)/actual))
+}
+MAE
+MAPE
+mae<-MAE(testData$Risk.Rating...PD...Assigned, p1)
+mape<-MAPE(testData$Risk.Rating...PD...Assigned, p1)
+mae
+mape
+#model dependent variable, default.indicator
+forest1<-randomForest(x=trainX,y=trainY, ntree=5 ,replace=TRUE)
+p2<-predict(forest1, testData)
+MAE <- function(actual , predicted){
+  mean(abs(as.integer(actual) -as.integer( predicted)))
+}
+MAPE <- function(actual , predicted){
+  mean(abs((actual- predicted)/actual))
+}
+MAE
+MAPE
+mae<-MAE(testData$Default.Indicator, p2)
+mape<-MAPE(testData$Risk.Rating...PD...Assigned, p2)
+mae
+mape
+resulttable2<-cbind(testData$Risk.Rating...PD...Assigned, p2)
+library(xlsx)
+colnames(resulttable2)<-c('ACTUAL CREDIT RATING', 'RANDOM FOREST PREDICTED CREDIT RATING')
+filename<-'FullQ4 actual and predicted with RandomForest.xlsx'
+write.xlsx(resulttable2,filename,sheetName = 'predicted Credit Rating')
+write.xlsx(mae,filename,sheetName = 'Mean Absolute Error', append = TRUE)
+write.xlsx(mape,filename,sheetName = 'Mean Absolute Percentage Error', append = TRUE)
+# #try using classification method instead of regression method
+# #####
+
+
+
